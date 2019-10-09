@@ -1,0 +1,84 @@
+{
+  "about": {
+    "name": "microservices",
+    "faviconurl": "/images/microservices.png",
+    "imageurl": "/images/microservices.png",
+    "url": "/documentation",
+    "description": "Data Connectors",
+    "projectname": "microservices"
+  },
+  "services": {
+    "snowflake": {
+      "init": {
+        "class": "../../snowflake.js",
+        "function": "initialize",
+        "optionschema": {
+          "type": "object",
+          "required": [
+            "persistence"
+          ],
+          "properties": {
+            "persistence": {
+              "type": "object",
+              "required": [
+                "type",
+                "account",
+                "user",
+                "password"
+              ],
+              "properties": {
+                "type": {
+                  "description": "type of persistence",
+                  "type": {
+                    "enum": [
+                      "snowflake"
+                    ]
+                  }
+                },
+                "account": {
+                  "description": "host name for the mysql server",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "user": {
+                  "description": "username",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "password": {
+                  "description": "password",
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "options": {
+          "persistence": {
+            "type": "snowflake",
+            "host": "snowflake-accountname",
+            "user": "snowflake-user",
+            "password": "snowflake-password"
+          }
+        }
+      },
+      "protocol": "http",
+      "port": "8000",
+      "hostname": "localhost",
+      "certPath": "certs/snowflake",
+      "description": "REST END POINT for your project with no security restrictions",
+      "configfilepath": "./snowflake_appconfig.json",
+      "security": "nokey"
+    },
+    "oracledb": {
+      "protocol": "http",
+      "port": "8001",
+      "hostname": "localhost",
+      "certPath": "certs/oracledb",
+      "description": "REST END POINT for your project with no security restrictions",
+      "configfilepath": "./oracledb_appconfig.json",
+      "security": "nokey"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "loglevel": "trace",
+  "servicename": "snowflake",
+  "routes": [
+    {
+      "route": "/snowflake/images",
+      "type": "static",
+      "configured": true,
+      "routeclass": "images",
+      "description": "app specific images are served from the directory images under route /snowflake/images"
+    },
+    {
+      "route": "/",
+      "type": "get",
+      "configured": true,
+      "routeclass": "snowflake.js",
+      "routefunction": "Root",
+      "description": "Your first Microservice end point"
+    },
+    {
+      "route": "/databases",
+      "type": "get",
+      "configured": true,
+      "routeclass": "snowflake.js",
+      "routefunction": "GetDatabases",
+      "description": "Gets all DB names"
+    }
+  ]
+}
