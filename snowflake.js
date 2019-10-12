@@ -39,7 +39,7 @@ function Error(status, err) {
 function ExecuteQuery(strQuery, params, cb) {
     console.log(strQuery);
 
-    let rsrc = params.join(".")
+    // let rsrc = params.join(".")
     persistence.connection.execute({
         // sqlText: 'select c1 from (select :1 as c1 union all select :2 as c1) where c1 = :1;',
         // sqlText: "SELECT * FROM ?.?.?;",
@@ -266,6 +266,55 @@ exports.CreateTable = function (req, res) {
     });
 }
 
+exports.GetTableSchema = function(req, res) {
+
+    let database = req.params.database;
+    let schema = req. params.schema;
+    let table = req.params.table;
+
+    let sqlQuery = sqlTmplt.SelectTableSchema[0] + database + sqlTmplt.SelectTableSchema[1];
+    let params = [schema, table];
+    
+    ExecuteQuery(sqlQuery, params, function (err, results) {
+        if (err) {
+            res.status(err.status).json(err.message);
+            return;
+        }
+        res.status(200).json(results);
+    });
+}
+
+exports.InsertRecord = function (req, res) {
+    
+    let database = req.params.database;
+    let schema = req. params.schema;
+    let table = req.params.table;
+
+    let colsData = req.body.columns;
+
+    let colsToInsert = [];
+    let dataToInsert = [];
+
+    for (let item of colsData) {
+        colsToInsert.push(item["column"]);
+        dataToInsert.push(item["value"]);
+    }
+
+    let cols = colsToInsert.join(", ");
+    let data = dataToInsert.map(x => "'" + x + "'").join(", ");
+
+    let sqlQuery = `INSERT INTO ${database}.${schema}.${table} ( ${cols} )  VALUES (${data})`;  
+    let params = [];
+
+    ExecuteQuery(sqlQuery, params, function (err, results) {
+        if (err) {
+            res.status(err.status).json(err.message);
+            return;
+        }
+        res.status(200).json(results);
+    });
+}
+
 exports.GetTableRows = function (req, res) {
 
     let database = req.params.database;
@@ -320,10 +369,6 @@ exports.GetTableRowCount = function (req, res) {
         res.status(200).json(results);
     });
 }
-
-
-
-
 
 exports.Root = function (req, res) {
     res.status(200).json({ "return value ": "Your first successful Microservice End Point" })
