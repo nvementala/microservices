@@ -12,3 +12,5 @@ exports.SelectRowsFromTableLimit = "SELECT * FROM :1.:2.:3 LIMIT :4;";
 exports.SelectRowCount = "SELECT count(*) as total_rows FROM ";
 
 exports.SelectTableSchema = ["SELECT * FROM ", ".information_schema.columns WHERE table_schema = :1 AND table_name = :2 ORDER BY ORDINAL_POSITION;"];
+
+exports.ShowProcedures = "SHOW PROCEDURES IN ";

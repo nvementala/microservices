@@ -138,7 +138,6 @@
                         "type": "string"
                     }
                 }
-
             },
             "bodyschema": {
                 "required": [
@@ -170,7 +169,8 @@
             "description": "Gets all DB names",
             "paramschema": {
                 "required": [
-                    "database", "schema"
+                    "database",
+                    "schema"
                 ],
                 "type": "object",
                 "properties": {
@@ -199,7 +199,8 @@
             "description": "Get all tables in a schema in a DB",
             "paramschema": {
                 "required": [
-                    "database", "schema"
+                    "database",
+                    "schema"
                 ],
                 "type": "object",
                 "properties": {
@@ -228,7 +229,8 @@
             "description": "Create a table in a schema in a DB",
             "paramschema": {
                 "required": [
-                    "database", "schema"
+                    "database",
+                    "schema"
                 ],
                 "type": "object",
                 "properties": {
@@ -352,7 +354,9 @@
             "description": "Get schema for a table",
             "paramschema": {
                 "required": [
-                    "database", "schema", "table"
+                    "database",
+                    "schema",
+                    "table"
                 ],
                 "type": "object",
                 "properties": {
@@ -510,7 +514,9 @@
             "description": "Get all coumns and all rows in a table",
             "paramschema": {
                 "required": [
-                    "database", "schema", "table"
+                    "database",
+                    "schema",
+                    "table"
                 ],
                 "type": "object",
                 "properties": {
@@ -552,7 +558,9 @@
             "description": "Get all coumns and all rows in a table",
             "paramschema": {
                 "required": [
-                    "database", "schema", "table"
+                    "database",
+                    "schema",
+                    "table"
                 ],
                 "type": "object",
                 "properties": {
@@ -594,7 +602,9 @@
             "description": "Get the row count for the table",
             "paramschema": {
                 "required": [
-                    "database", "schema", "table"
+                    "database",
+                    "schema",
+                    "table"
                 ],
                 "type": "object",
                 "properties": {
@@ -624,6 +634,349 @@
                 {
                     "param": "/databases/SNOWFLAKE_SAMPLE_DATA/schema/TPCH_SF1000/tables/CUSTOMER/rowcount",
                     "payload": {}
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/schemas/:schema/storedprocs",
+            "configured": true,
+            "type": "get",
+            "routeclass": "snowflake.js",
+            "routefunction": "GetStoredProcedures",
+            "description": "List all the stored procedure in the database",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "schema"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string"
+                    },
+                    "schema": {
+                        "description": "name of the schema",
+                        "type": "string"
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/db_one/schemas/myschema/storedprocs"
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/schemas/:schema/storedprocs",
+            "configured": true,
+            "type": "post",
+            "routeclass": "snowflake.js",
+            "routefunction": "CreateStoredProcedures",
+            "description": "List all the stored procedure in the database",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "schema"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string"
+                    },
+                    "schema": {
+                        "description": "name of the schema",
+                        "type": "string"
+                    }
+                }
+            },
+            "bodyschema": {
+                "required": [
+                    "name",
+                    "body"
+                ],
+                "type": "object",
+                "properties": {
+                    "required": [
+                        "name"
+                    ],
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "body": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "input_params": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "name",
+                                "type"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "parameter name"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "description": "sql compatible datatypes"
+                                }
+                            }
+                        }
+                    },
+                    "return_type": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/db_one/schemas/myschema/storedprocs",
+                    "payload": {
+                        "name": "testsp",
+                        "input_params": [
+                            {
+                                "name": "NAME",
+                                "type": "string"
+                            }
+                        ],
+                        "return_type": "STRING",
+                        "body": "var hello = \"Hello \" + NAME ; return hello;"
+                    }
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/schemas/:schema/storedprocs/:spname",
+            "configured": true,
+            "type": "get",
+            "routeclass": "snowflake.js",
+            "routefunction": "GetStoredProceduresDetails",
+            "description": "Get storedprocedure details in the database with the name",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "schema",
+                    "spname"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "schema": {
+                        "description": "name of the schema",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "spname": {
+                        "description": "name of the stored procedure",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "bodyschema": {
+                "required": [
+                    "inputParamType"
+                ],
+                "type": "object",
+                "properties": {
+                    "inputParamType": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/db_one/schemas/myschema/storedprocs/testsp",
+                    "payload": {
+                        "inputParamType": [
+                            "STRING"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/schemas/:schema/storedprocs/:spname",
+            "configured": true,
+            "type": "delete",
+            "routeclass": "snowflake.js",
+            "routefunction": "DeleteStoredProcedures",
+            "description": "Delete the storedprocedure in the database with the name",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "schema",
+                    "spname"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "schema": {
+                        "description": "name of the schema",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "spname": {
+                        "description": "name of the stored procedure",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "bodyschema": {
+                "required": [
+                    "inputParamType"
+                ],
+                "type": "object",
+                "properties": {
+                    "inputParamType": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/db_one/schemas/myschema/storedprocs/testsp",
+                    "payload": {
+                        "params": [
+                            "STRING"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/schemas/:schema/storedprocs/:spname/exec",
+            "configured": true,
+            "type": "get",
+            "routeclass": "snowflake.js",
+            "routefunction": "ExecStoredProcedures",
+            "description": "Execute storedprocedure in the database with the name",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "schema",
+                    "spname"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "schema": {
+                        "description": "name of the schema",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "spname": {
+                        "description": "name of the stored procedure",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "bodyschema": {
+                "required": [
+                    "params"
+                ],
+                "type": "object",
+                "properties": {
+                    "params": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/db_one/schemas/myschema/storedprocs/testsp/exec",
+                    "payload": {
+                        "params": [
+                            "World"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/schemas/:schema/execstatements",
+            "configured": true,
+            "type": "get",
+            "routeclass": "snowflake.js",
+            "routefunction": "ExecGeneralQuery",
+            "description": "Execute general query in the database with the name",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "schema"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "schema": {
+                        "description": "name of the schema",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "bodyschema": {
+                "required": [
+                    "statements"
+                ],
+                "type": "object",
+                "properties": {
+                    "statements": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/db_one/schemas/myschema/execstatements",
+                    "payload": {
+                        "statements": "SELECT * FROM EMPLOYEES;"
+                    }
+                },
+                {
+                    "param": "/databases/SNOWFLAKE_SAMPLE_DATA/schemas/TPCH_SF1000/execstatements",
+                    "payload": {
+                        "statements": "SELECT * FROM CUSTOMER LIMIT 25;"
+                    }
                 }
             ]
         }

@@ -105,7 +105,7 @@ exports.GetDatabases = function (req, res) {
         // res.status(200).json(results);
         let databases = [];
         for (let item of results) {
-            databases.push({'name': item['name']});
+            databases.push({ 'name': item['name'] });
         }
         res.status(200).json(databases);
     });
@@ -157,7 +157,7 @@ exports.GetSchemas = function (req, res) {
         // res.status(200).json(results);
         let schemas = [];
         for (let item of results) {
-            schemas.push({'name': item['name']});
+            schemas.push({ 'name': item['name'] });
         }
         res.status(200).json(schemas);
     });
@@ -214,7 +214,7 @@ exports.GetTables = function (req, res) {
         // res.status(200).json(results);
         let tables = [];
         for (let item of results) {
-            tables.push({'name': item['name']});
+            tables.push({ 'name': item['name'] });
         }
         res.status(200).json(tables);
     });
@@ -224,7 +224,7 @@ exports.CreateTable = function (req, res) {
 
     let database = req.params.database;
     let schema = req.params.schema;
-    
+
     let table = req.body.table;
     let columns = req.body.columns;
 
@@ -256,7 +256,7 @@ exports.CreateTable = function (req, res) {
     }
 
     let params = [];
-    
+
     ExecuteQuery(sqlQuery, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
@@ -266,15 +266,15 @@ exports.CreateTable = function (req, res) {
     });
 }
 
-exports.GetTableSchema = function(req, res) {
+exports.GetTableSchema = function (req, res) {
 
     let database = req.params.database;
-    let schema = req. params.schema;
+    let schema = req.params.schema;
     let table = req.params.table;
 
     let sqlQuery = sqlTmplt.SelectTableSchema[0] + database + sqlTmplt.SelectTableSchema[1];
     let params = [schema, table];
-    
+
     ExecuteQuery(sqlQuery, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
@@ -285,9 +285,9 @@ exports.GetTableSchema = function(req, res) {
 }
 
 exports.InsertRecord = function (req, res) {
-    
+
     let database = req.params.database;
-    let schema = req. params.schema;
+    let schema = req.params.schema;
     let table = req.params.table;
 
     let colsData = req.body.columns;
@@ -303,7 +303,7 @@ exports.InsertRecord = function (req, res) {
     let cols = colsToInsert.join(", ");
     let data = dataToInsert.map(x => "'" + x + "'").join(", ");
 
-    let sqlQuery = `INSERT INTO ${database}.${schema}.${table} ( ${cols} )  VALUES (${data})`;  
+    let sqlQuery = `INSERT INTO ${database}.${schema}.${table} ( ${cols} )  VALUES (${data})`;
     let params = [];
 
     ExecuteQuery(sqlQuery, params, function (err, results) {
@@ -318,7 +318,7 @@ exports.InsertRecord = function (req, res) {
 exports.GetTableRows = function (req, res) {
 
     let database = req.params.database;
-    let schema = req. params.schema;
+    let schema = req.params.schema;
     let table = req.params.table;
 
     let sqlQuery = sqlTmplt.SelectRowsFromTable + database + "." + schema + "." + table;
@@ -334,9 +334,9 @@ exports.GetTableRows = function (req, res) {
 }
 
 exports.GetTableRowsLimit = function (req, res) {
-    
+
     let database = req.params.database;
-    let schema = req. params.schema;
+    let schema = req.params.schema;
     let table = req.params.table;
     let limit = req.params.limit;
 
@@ -355,7 +355,7 @@ exports.GetTableRowsLimit = function (req, res) {
 exports.GetTableRowCount = function (req, res) {
 
     let database = req.params.database;
-    let schema = req. params.schema;
+    let schema = req.params.schema;
     let table = req.params.table;
 
     let sqlQuery = sqlTmplt.SelectRowCount + database + "." + schema + "." + table;
@@ -368,6 +368,161 @@ exports.GetTableRowCount = function (req, res) {
         }
         res.status(200).json(results);
     });
+}
+
+exports.GetStoredProcedures = function (req, res) {
+
+    let database = req.params.database;
+    let schema = req.params.schema;
+
+    let sqlQuery = sqlTmplt.ShowProcedures + database + "." + schema;
+    let params = [];
+
+    ExecuteQuery(sqlQuery, params, function (err, results) {
+        if (err) {
+            res.status(err.status).json(err.message);
+            return;
+        }
+
+        res.status(200).json(results);
+    });
+
+}
+
+exports.CreateStoredProcedures = function (req, res) {
+
+    let database = req.params.database;
+    let schema = req.params.schema;
+
+    let spName = req.body.name;
+    let spBody = req.body.body;
+    let input_params = req.body.input_params;
+    let return_type = req.body.return_type;
+
+    let spIdentifier = database + "." + schema + "." + spName;
+    let listOfInputParams = input_params.map(x => x['name'].toUpperCase() + " " + x['type']).join(", ");
+
+
+    let sqlQuery = `CREATE OR REPLACE PROCEDURE ${spIdentifier} (${listOfInputParams})
+                 RETURNS ${return_type} 
+                 LANGUAGE JAVASCRIPT 
+                 AS
+                 $$
+                    ${spBody}
+                 $$;`;
+    let params = [];
+
+    ExecuteQuery(sqlQuery, params, function (err, results) {
+        if (err) {
+            res.status(err.status).json(err.message);
+            return;
+        }
+
+        res.status(200).json(results);
+    });
+}
+
+exports.GetStoredProceduresDetails = function (req, res) {
+
+    let database = req.params.database;
+    let schema = req.params.schema;
+    let spName = req.params.spname;
+
+    let inputParamType = req.body.inputParamType;
+
+    let spIdentifier = database + "." + schema + "." + spName;
+    let listOfInputParamType = inputParamType.map(x => x.toUpperCase()).join(", ");
+
+    let sqlQuery =  `DESC PROCEDURE ${spIdentifier} (${listOfInputParamType})`;
+    let params = [];
+
+    ExecuteQuery(sqlQuery, params, function (err, results) {
+        if (err) {
+            res.status(err.status).json(err.message);
+            return;
+        }
+
+        res.status(200).json(results);
+    });
+}
+
+exports.DeleteStoredProcedures = function (req, res) {
+    
+    let database = req.params.database;
+    let schema = req.params.schema;
+    let spName = req.params.spname;
+
+    let inputParamType = req.body.inputParamType;
+
+    let spIdentifier = database + "." + schema + "." + spName;
+    let listOfInputParamType = inputParamType.map(x => x.toUpperCase()).join(", ");
+
+    let sqlQuery = `DROP PROCEDURE ${spIdentifier} (${listOfInputParamType})`;
+    let params = [];
+
+    ExecuteQuery(sqlQuery, params, function (err, results) {
+        if (err) {
+            res.status(err.status).json(err.message);
+            return;
+        }
+
+        res.status(200).json(results);
+    });
+}
+
+exports.ExecStoredProcedures = function (req, res) {
+
+    let database = req.params.database;
+    let schema = req.params.schema;
+    let spName = req.params.spname;
+
+    let inputParams = req.body.params;
+
+    let spIdentifier = database + "." + schema + "." + spName;
+    let listOfInputParams = inputParams.map(x => "'" + x.toUpperCase() + "'").join(", ");
+
+    let sqlQuery = `CALL ${spIdentifier} (${listOfInputParams})`;
+    let params = [];
+
+    ExecuteQuery(sqlQuery, params, function (err, results) {
+        if (err) {
+            res.status(err.status).json(err.message);
+            return;
+        }
+
+        res.status(200).json(results);
+    });
+}
+
+exports.ExecGeneralQuery = function (req, res) {
+
+    let database = req.params.database;
+    let schema = req.params.schema;
+
+    let statement = req.body.statements;
+
+    let sqlQuery = "USE " + database + "." + schema + "; "
+    let params = [];
+
+    ExecuteQuery(sqlQuery, params, function (err, results) {
+        if (err) {
+            res.status(err.status).json(err.message);
+            return;
+        }
+
+        sqlQuery = statement;
+        params = [];
+
+        ExecuteQuery(sqlQuery, params, function (err, results) {
+            if (err) {
+                res.status(err.status).json(err.message);
+                return;
+            }
+
+            res.status(200).json(results);
+        });
+    });
+
 }
 
 exports.Root = function (req, res) {
