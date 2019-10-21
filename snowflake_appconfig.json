@@ -24,18 +24,6 @@
             "routeclass": "snowflake.js",
             "routefunction": "GetDatabases",
             "description": "Gets all DB names",
-            "paramschema": {
-                "required": [
-                    "name"
-                ],
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "description": "name of the database to delete",
-                        "type": "string"
-                    }
-                }
-            },
             "examples": [
                 {
                     "param": "/databases"
@@ -79,7 +67,7 @@
             "description": "Gets all DB names",
             "paramschema": {
                 "required": [
-                    "name"
+                    "database"
                 ],
                 "type": "object",
                 "properties": {
@@ -782,32 +770,35 @@
                         "description": "name of the stored procedure",
                         "type": "string",
                         "minLength": 1
-                    }
-                }
-            },
-            "bodyschema": {
-                "required": [
-                    "inputParamType"
-                ],
-                "type": "object",
-                "properties": {
+                    },
                     "inputParamType": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "minLength": 1
+                        "description": "input type of params for the procedure",
+                        "type": {
+                            "anyof": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "anyof": [
+                                            {
+                                                "type": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
             },
             "examples": [
                 {
-                    "param": "/databases/db_one/schemas/myschema/storedprocs/testsp",
-                    "payload": {
-                        "inputParamType": [
-                            "STRING"
-                        ]
-                    }
+                    "param": "/databases/db_one/schemas/myschema/storedprocs/testsp?inputParamType=STRING"
+                },
+                {
+                    "param": "/databases/db_one/schemas/myschema/storedprocs/testsp?inputParamType=STRING&inputParamType=STRING"
                 }
             ]
         },
@@ -870,7 +861,7 @@
             ]
         },
         {
-            "route": "/databases/:database/schemas/:schema/storedprocs/:spname/exec",
+            "route": "/databases/:database/schemas/:schema/storedprocs/:spname/actions/exec",
             "configured": true,
             "type": "get",
             "routeclass": "snowflake.js",
@@ -898,32 +889,38 @@
                         "description": "name of the stored procedure",
                         "type": "string",
                         "minLength": 1
-                    }
-                }
-            },
-            "bodyschema": {
-                "required": [
-                    "params"
-                ],
-                "type": "object",
-                "properties": {
+                    },
                     "params": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "minLength": 1
+                        "description": "input params for the procedure",
+                        "type": {
+                            "anyof": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "anyof": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
             },
             "examples": [
                 {
-                    "param": "/databases/db_one/schemas/myschema/storedprocs/testsp/exec",
-                    "payload": {
-                        "params": [
-                            "World"
-                        ]
-                    }
+                    "param": "/databases/db_one/schemas/myschema/storedprocs/testsp/actions/exec?params=world"
+                },
+                {
+                    "param": "/databases/db_one/schemas/myschema/storedprocs/testsp/actions/exec?params=world&params=MacBook"
                 }
             ]
         },

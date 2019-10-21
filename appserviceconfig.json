@@ -63,7 +63,7 @@
           }
         }
       },
-      "protocol": "http",
+      "protocol": "https",
       "port": "8000",
       "hostname": "localhost",
       "certPath": "certs/snowflake",
@@ -72,7 +72,7 @@
       "security": "nokey"
     },
     "oracledb": {
-      "protocol": "http",
+      "protocol": "https",
       "port": "8001",
       "hostname": "localhost",
       "certPath": "certs/oracledb",

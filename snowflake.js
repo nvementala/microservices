@@ -50,49 +50,12 @@ function ExecuteQuery(strQuery, params, cb) {
                 console.error('Failed to execute statement due to the following error: ' + err.message);
                 return cb(Error(422, err), null);
             } else {
-                console.log(rows);
+                // console.log(rows);
                 cb(null, rows);
             }
         }
     });
 
-}
-
-function NewConnectionFunc(account, user, password, cb) {
-    persistence.connection.destroy(function (err, conn) {
-        if (err) {
-            console.error('Unable to disconnect: ' + err.message);
-            cb(Error(422, err), null);
-        }
-
-        persistence.connection = snowflake.createConnection({
-            "account": account,
-            "username": user,
-            "password": password
-        });
-
-        persistence.connection.connect(function (err, conn) {
-            if (err) {
-                return cb(Error(422, err), null);
-            }
-            else {
-                console.log("Successfully established connection and connection id: " + conn.getId());
-            }
-        });
-
-        cb(null, { "data": "OK" });
-
-    });
-}
-
-exports.NewConnection = function (req, res) {
-    NewConnectionFunc(req.body.account, req.body.user, req.body.password, function (err, results) {
-        if (err) {
-            res.status(err.status).json(err.message);
-            return;
-        }
-        res.status(200).json(results);
-    })
 }
 
 exports.GetDatabases = function (req, res) {
@@ -428,10 +391,15 @@ exports.GetStoredProceduresDetails = function (req, res) {
     let schema = req.params.schema;
     let spName = req.params.spname;
 
-    let inputParamType = req.body.inputParamType;
+    let inputParamType = req.query.param;
 
     let spIdentifier = database + "." + schema + "." + spName;
-    let listOfInputParamType = inputParamType.map(x => x.toUpperCase()).join(", ");
+    let listOfInputParamType = "";
+    
+    if (Array.isArray(inputParamType))
+        listOfInputParamType = inputParamType.map(x => x.toUpperCase()).join(", ");
+    else
+        listOfInputParamType = `${inputParamType}`;
 
     let sqlQuery =  `DESC PROCEDURE ${spIdentifier} (${listOfInputParamType})`;
     let params = [];
@@ -476,10 +444,15 @@ exports.ExecStoredProcedures = function (req, res) {
     let schema = req.params.schema;
     let spName = req.params.spname;
 
-    let inputParams = req.body.params;
+    let inputParams = req.query.params;
 
     let spIdentifier = database + "." + schema + "." + spName;
-    let listOfInputParams = inputParams.map(x => "'" + x.toUpperCase() + "'").join(", ");
+    
+    let listOfInputParams = "";
+    if (Array.isArray(inputParams))
+        listOfInputParams = inputParams.map(x => "'" + x.toUpperCase() + "'").join(", ");
+    else
+        listOfInputParams = `'${inputParams.toUpperCase()}'`;
 
     let sqlQuery = `CALL ${spIdentifier} (${listOfInputParams})`;
     let params = [];
