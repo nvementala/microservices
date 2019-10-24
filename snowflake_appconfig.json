@@ -378,7 +378,7 @@
             ]
         },
         {
-            "route": "/databases/:database/schemas/:schema/tables/:table",
+            "route": "/databases/:database/schemas/:schema/tables/:table/rows",
             "configured": true,
             "type": "post",
             "routeclass": "snowflake.js",
