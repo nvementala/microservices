@@ -20,7 +20,7 @@ exports.CreateSP = function (req, res) {
                     BEGIN ${procBody} END`;
 
     let sqlQuery = [sqlQuery1, sqlQuery2].join(" ");
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlQuery, [], function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
@@ -33,9 +33,9 @@ exports.CreateSP = function (req, res) {
 exports.GetSPs = function (req, res) {
 
     let database = req.params.database;
+    let params = [database];
 
-    let sqlQuery = mysql.format(sqlTmplt.GetSP, [database]);
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlTmplt.GetSP, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
@@ -51,9 +51,8 @@ exports.GetSPDetails = function (req, res) {
     let storedProc = req.params.name;
 
     let params = [database, storedProc];
-    let sqlQuery = mysql.format(sqlTmplt.GetSPDetails, params);
 
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlTmplt.GetSPDetails, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
@@ -70,9 +69,8 @@ exports.DeleteSP = function (req, res) {
     let storedProc = req.params.name;
 
     let params = [database, storedProc];
-    let sqlQuery = mysql.format(sqlTmplt.DropSP, params);
 
-    relstoreJs.ExecuteQuery(strQ, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlTmplt.DropSP, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
@@ -114,7 +112,7 @@ exports.ExecSP = function (req, res) {
 
     let sqlQuery = [preStatements, execStatement, postStatements].join(" ");
 
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlQuery, [], function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;

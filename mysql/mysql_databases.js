@@ -21,9 +21,8 @@ exports.CreateDatabase = function (req, res) {
 
     let database = req.body.name;
     let params = [database];
-    let sqlQuery = mysql.format(sqlTmplt.CreateDatabase, params);
 
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlTmplt.CreateDatabase, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
@@ -37,9 +36,8 @@ exports.DeleteDatabase = function (req, res) {
 
     let database = req.params.name;
     let params = [database];
-    let sqlQuery = mysql.format(sqlTmplt.DropDatabase, params);
 
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlTmplt.DropDatabase, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;

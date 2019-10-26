@@ -34,7 +34,7 @@ function Error(status, err) {
     return { "status": status, "message": err };
 }
 
-exports.ExecuteQuery = function (strQuery, cb) {
+exports.ExecuteQuery = function (strQuery, params, cb) {
     console.log(strQuery);
     // execute will internally call prepare and query
     persistence.pool.getConnection(function (err, connection) {
@@ -42,7 +42,7 @@ exports.ExecuteQuery = function (strQuery, cb) {
             cb(Error(422, err), null);
             return;
         }
-        connection.query(strQuery, function (err, results, fields) {
+        connection.query(strQuery, params, function (err, results, fields) {
             connection.release();
             if (err) {
                 cb(Error(422, err), null)

@@ -8,11 +8,20 @@ exports.GetTables = function (req, res) {
 
     let database = req.params.database;
     let params = [database];
-    let sqlQuery = mysql.format(sqlTmplt.ShowTables, params);
 
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlTmplt.ShowTables, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
+            return;
+        }
+
+        if (results.length > 0) {
+            let key = Object.keys(results[0])[0];
+            let resp = [];
+            for (let item of results) {
+                resp.push({ "name": item[key] });
+            }
+            res.status(200).json(resp);
             return;
         }
         res.status(200).json(results);
@@ -24,10 +33,10 @@ exports.GetTableSchema = function (req, res) {
 
     let database = req.params.database;
     let tablename = req.params.table;
-    let params = [database, tablename];
-    let strQuery = mysql.format(sqlTmplt.GetTableSchema, params);
 
-    relstoreJs.ExecuteQuery(strQuery, function (err, results) {
+    let params = [database, tablename];
+
+    relstoreJs.ExecuteQuery(sqlTmplt.GetTableSchema, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
@@ -74,7 +83,7 @@ exports.CreateTable = function (req, res) {
         sqlQuery = `CREATE TABLE ${database}.${table} ( ${columnSql} );`
     }
 
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlQuery, [], function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
@@ -96,8 +105,8 @@ exports.InsertRecord = function (req, res) {
     }
 
     let params = [database, table, columnsDict]
-    let sqlQuery = mysql.format(sqlTmplt.InsertRecordIntoTable, params);
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+
+    relstoreJs.ExecuteQuery(sqlTmplt.InsertRecordIntoTable, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
@@ -113,9 +122,8 @@ exports.GetTableRows = function (req, res) {
     let table = req.params.table;
 
     let params = [database, table];
-    let sqlQuery = mysql.format(sqlTmplt.GetTableRows, params);
 
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlTmplt.GetTableRows, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
@@ -132,9 +140,8 @@ exports.GetTableRowsLimit = function (req, res) {
     let limit = parseInt(req.params.limit);
 
     let params = [database, table, limit];
-    let sqlQuery = mysql.format(sqlTmplt.GetTableRowsLimit, params);
 
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlTmplt.GetTableRowsLimit, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
@@ -150,9 +157,8 @@ exports.GetTableRowCount = function (req, res) {
     let table = req.params.table;
 
     let params = [database, table];
-    let sqlQuery = mysql.format(sqlTmplt.GetTableRowCount, params);
 
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlTmplt.GetTableRowCount, params, function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;

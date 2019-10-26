@@ -11,7 +11,7 @@ exports.GeneralQuery = function (req, res) {
 
     let sqlQuery = [mysql.format(sqlTmplt.UseDB, [database]), statement].join(" ");
 
-    relstoreJs.ExecuteQuery(sqlQuery, function (err, results) {
+    relstoreJs.ExecuteQuery(sqlQuery, [], function (err, results) {
         if (err) {
             res.status(err.status).json(err.message);
             return;
