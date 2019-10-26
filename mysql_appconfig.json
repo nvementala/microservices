@@ -1,0 +1,737 @@
+{
+    "servicename": "mysql",
+    "routes": [
+        {
+            "route": "/databases",
+            "configured": true,
+            "type": "get",
+            "routeclass": "mysql/mysql_databases.js",
+            "routefunction": "GetDatabases",
+            "description": "Get databases at this mysql server",
+            "examples": [
+                {
+                    "param": "/databases"
+                }
+            ]
+        },
+        {
+            "route": "/databases",
+            "configured": true,
+            "type": "post",
+            "routeclass": "mysql/mysql_databases.js",
+            "routefunction": "CreateDatabase",
+            "description": "Crete a named database",
+            "bodyschema": {
+                "required": [
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "name of the database to create",
+                        "type": "string"
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases",
+                    "payload": {
+                        "name": "test"
+                    }
+                }
+            ]
+        },
+        {
+            "route": "/databases/:name",
+            "configured": true,
+            "type": "delete",
+            "routeclass": "mysql/mysql_databases.js",
+            "routefunction": "DeleteDatabase",
+            "description": "Delete named database",
+            "paramschema": {
+                "required": [
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "name of the database to delete",
+                        "type": "string"
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/test"
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/tables",
+            "configured": true,
+            "type": "get",
+            "routeclass": "mysql/mysql_tables.js",
+            "routefunction": "GetTables",
+            "description": "Get all coumns and all rows in a table",
+            "examples": [
+                {
+                    "param": "/databases/retail/tables"
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/tables/:table",
+            "configured": true,
+            "type": "get",
+            "routeclass": "mysql/mysql_tables.js",
+            "routefunction": "GetTableSchema",
+            "description": "Get schema for a table",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "table"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string"
+                    },
+                    "table": {
+                        "description": "name of the table",
+                        "type": "string"
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/retail/tables/sales"
+                },
+                {
+                    "param": "/databases/test/tables/employees"
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/tables",
+            "configured": true,
+            "type": "post",
+            "routeclass": "mysql/mysql_tables.js",
+            "routefunction": "CreateTable",
+            "description": "Create Table with the schema",
+            "paramschema": {
+                "required": [
+                    "database"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string"
+                    }
+                }
+            },
+            "bodyschema": {
+                "type": "object",
+                "properties": {
+                    "required": [
+                        "table"
+                    ],
+                    "table": {
+                        "description": "table name",
+                        "type": "string"
+                    },
+                    "columns": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "column",
+                                "ctype"
+                            ],
+                            "properties": {
+                                "column": {
+                                    "type": "string",
+                                    "description": "column name"
+                                },
+                                "ctype": {
+                                    "type": "string",
+                                    "description": "column data type"
+                                },
+                                "special": {
+                                    "type": "string",
+                                    "description": "optional special strings like null, not null etc. this will append after column name and type are passed to create table"
+                                },
+                                "primarykey": {
+                                    "type": "boolean",
+                                    "description": "If present this column will be primary key"
+                                },
+                                "foreignkey": {
+                                    "type": "object",
+                                    "required": [
+                                        "table"
+                                    ],
+                                    "table": {
+                                        "type": "string",
+                                        "description": "the table name the foreign key references"
+                                    },
+                                    "column": {
+                                        "type": "string",
+                                        "description": "the table column (optional) the foreign key references"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/test/tables",
+                    "payload": {
+                        "table": "employees",
+                        "columns": [
+                            {
+                                "column": "emp_id",
+                                "ctype": "INT",
+                                "primarykey": true
+                            },
+                            {
+                                "column": "first_name",
+                                "ctype": "VARCHAR(255)",
+                                "special": "NOT NULL"
+                            },
+                            {
+                                "column": "last_name",
+                                "ctype": "VARCHAR(255)",
+                                "special": "NOT NULL"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "param": "/databases/test/tables",
+                    "payload": {
+                        "table": "salaries",
+                        "columns": [
+                            {
+                                "column": "emp",
+                                "ctype": "INT",
+                                "foreignkey": {
+                                    "table": "employees",
+                                    "column": "emp_id"
+                                }
+                            },
+                            {
+                                "column": "salary",
+                                "ctype": "int(11)",
+                                "special": "NOT NULL"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/tables/:table/rows",
+            "configured": true,
+            "type": "post",
+            "routeclass": "mysql/mysql_tables.js",
+            "routefunction": "InsertRecord",
+            "description": "insert a record into a table",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "table"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string"
+                    },
+                    "table": {
+                        "description": "name of the table",
+                        "type": "string"
+                    }
+                }
+            },
+            "bodyschema": {
+                "type": "object",
+                "properties": {
+                    "required": [
+                        "columns"
+                    ],
+                    "columns": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "column",
+                                "value"
+                            ],
+                            "properties": {
+                                "column": {
+                                    "type": "string",
+                                    "description": "column name"
+                                },
+                                "value": {
+                                    "anyOf": [
+                                        {
+                                            "type": "string"
+                                        },
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "number"
+                                        }
+                                    ],
+                                    "description": "column value"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/test/tables/employees/rows",
+                    "payload": {
+                        "columns": [
+                            {
+                                "column": "emp_id",
+                                "value": 1
+                            },
+                            {
+                                "column": "first_name",
+                                "value": "John"
+                            },
+                            {
+                                "column": "last_name",
+                                "value": "Doe"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "param": "/databases/test/tables/salaries/rows",
+                    "payload": {
+                        "columns": [
+                            {
+                                "column": "emp",
+                                "value": 1
+                            },
+                            {
+                                "column": "salary",
+                                "value": 100000
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/tables/:table/rows",
+            "configured": true,
+            "type": "get",
+            "routeclass": "mysql/mysql_tables.js",
+            "routefunction": "GetTableRows",
+            "description": "Get all coumns and all rows in a table",
+            "examples": [
+                {
+                    "param": "/databases/retail/tables/sales/rows",
+                    "payload": {}
+                },
+                {
+                    "param": "/databases/retail/tables/features/rows",
+                    "payload": {}
+                },
+                {
+                    "param": "/databases/retail/tables/stores/rows",
+                    "payload": {}
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/tables/:table/rows/:limit",
+            "configured": true,
+            "type": "get",
+            "routeclass": "mysql/mysql_tables.js",
+            "routefunction": "GetTableRowsLimit",
+            "description": "Get all coumns and all rows in a table upto limit",
+            "examples": [
+                {
+                    "param": "/databases/retail/tables/sales/rows/100"
+                },
+                {
+                    "param": "/databases/retail/tables/features/rows/10"
+                },
+                {
+                    "param": "/databases/retail/tables/stores/rows/20"
+                }
+            ]
+        },
+        {
+            "route": "/databases/{database}/tables/{table}/rowcount",
+            "configured": true,
+            "type": "get",
+            "routeclass": "mysql/mysql_tables.js",
+            "routefunction": "GetTableRowCount",
+            "description": "Get the row count for the table",
+            "examples": [
+                {
+                    "param": "/databases/retail/tables/sales/rowcount"
+                },
+                {
+                    "param": "/databases/retail/tables/features/rowcount"
+                },
+                {
+                    "param": "/databases/retail/tables/stores/rowcount"
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/storedprocs",
+            "configured": true,
+            "type": "post",
+            "routeclass": "mysql/mysql_storedprocs.js",
+            "routefunction": "CreateSP",
+            "description": "Create a stored procedure in the database",
+            "paramschema": {
+                "required": [
+                    "database"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string"
+                    }
+                }
+            },
+            "bodyschema": {
+                "required": [
+                    "name",
+                    "body"
+                ],
+                "type": "object",
+                "properties": {
+                    "required": [
+                        "name"
+                    ],
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "body": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "params": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "name",
+                                "mode",
+                                "type"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "parameter name"
+                                },
+                                "mode": {
+                                    "type": {
+                                        "enum": [
+                                            "in",
+                                            "out",
+                                            "inout"
+                                        ]
+                                    },
+                                    "description": "column value"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "description": "sql compatible datatypes"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/test/storedprocs",
+                    "payload": {
+                        "name": "testsp",
+                        "params": [
+                            {
+                                "name": "param1",
+                                "mode": "in",
+                                "type": "decimal(5,2)"
+                            },
+                            {
+                                "name": "param2",
+                                "mode": "out",
+                                "type": "decimal(5,2)"
+                            }
+                        ],
+                        "body": "SET param2 = param1 + 20;"
+                    }
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/storedprocs",
+            "configured": true,
+            "type": "get",
+            "routeclass": "mysql/mysql_storedprocs.js",
+            "routefunction": "GetSPs",
+            "description": "List all the stored procedure in the database",
+            "paramschema": {
+                "required": [
+                    "database"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string"
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/test/storedprocs"
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/storedprocs/:name",
+            "configured": true,
+            "type": "get",
+            "routeclass": "mysql/mysql_storedprocs.js",
+            "routefunction": "GetSPDetails",
+            "description": "Get storedprocedure details in the database with the name",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "name": {
+                        "description": "name of the stored procedure",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/test/storedprocs/testsp"
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/storedprocs/:name",
+            "configured": true,
+            "type": "delete",
+            "routeclass": "mysql/mysql_storedprocs.js",
+            "routefunction": "DeleteSP",
+            "description": "Delete storedprocedure in the database with the name",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "name": {
+                        "description": "name of the stored procedure",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/test/storedprocs/testsp"
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/storedprocs/:name/actions/exec",
+            "configured": true,
+            "type": "put",
+            "routeclass": "mysql/mysql_storedprocs.js",
+            "routefunction": "ExecSP",
+            "description": "Execute storedprocedure in the database with the name",
+            "paramschema": {
+                "required": [
+                    "database",
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "name": {
+                        "description": "name of the stored procedure",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "bodyschema": {
+                "required": [
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "required": [
+                        "name"
+                    ],
+                    "prestatements": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "poststatements": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "params": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "name",
+                                "mode"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "parameter name if mode is in, out, or inout and value if mode is lieteral"
+                                },
+                                "mode": {
+                                    "type": {
+                                        "enum": [
+                                            "in",
+                                            "out",
+                                            "inout",
+                                            "literal"
+                                        ]
+                                    },
+                                    "description": "parameter mode which is in, out, inout, or literal"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/test/storedprocs/testsp/actions/exec",
+                    "payload": {
+                        "name": "testsp",
+                        "prestatements": "set @var1 = 10.025;",
+                        "poststatements": "select @var2",
+                        "params": [
+                            {
+                                "name": "@var1",
+                                "mode": "in"
+                            },
+                            {
+                                "name": "@var2",
+                                "mode": "out"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "route": "/databases/:database/execstatements",
+            "configured": true,
+            "type": "post",
+            "routeclass": "mysql/mysql_generalquery.js",
+            "routefunction": "GeneralQuery",
+            "description": "Execute statements given as a strig with ; as delimeter",
+            "paramschema": {
+                "required": [
+                    "database"
+                ],
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "description": "name of the database",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "bodyschema": {
+                "required": [
+                    "statements"
+                ],
+                "type": "object",
+                "properties": {
+                    "statements": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "examples": [
+                {
+                    "param": "/databases/retail/execstatements",
+                    "payload": {
+                        "statements": "select * from sales limit 10"
+                    }
+                },
+                {
+                    "param": "/databases/retail/execstatements",
+                    "payload": {
+                        "statements": "select * from features limit 10"
+                    }
+                },
+                {
+                    "param": "/databases/retail/execstatements",
+                    "payload": {
+                        "statements": "select * from stores limit 10"
+                    }
+                },
+                {
+                    "param": "/databases/test/execstatements",
+                    "payload": {
+                        "statements": "insert into employees (emp_id, first_name, last_name) values(2, 'Roger', 'Meyer'); select * from employees"
+                    }
+                },
+                {
+                    "param": "/databases/test/execstatements",
+                    "payload": {
+                        "statements": "select * from employees limit 10"
+                    }
+                }
+            ]
+        }
+    ],
+    "loglevel": "trace"
+}

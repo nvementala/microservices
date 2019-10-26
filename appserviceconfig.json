@@ -79,6 +79,75 @@
       "description": "REST END POINT for your project with no security restrictions",
       "configfilepath": "./oracledb_appconfig.json",
       "security": "nokey"
+    },
+    "mysql": {
+      "init": {
+        "class": "../../relstore.js",
+        "function": "initialize",
+        "optionschema": {
+          "type": "object",
+          "required": [
+            "persistence"
+          ],
+          "properties": {
+            "persistence": {
+              "type": "object",
+              "required": [
+                "type",
+                "host",
+                "user",
+                "password"
+              ],
+              "properties": {
+                "type": {
+                  "description": "type of persistence",
+                  "type": {
+                    "enum": [
+                      "mysql"
+                    ]
+                  }
+                },
+                "host": {
+                  "description": "host name for the mysql server",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "user": {
+                  "description": "username",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "password": {
+                  "description": "password",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "connectionlimit": {
+                  "description": "Connections to the relational store are pooled. This sets the limit on the pool allocated",
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        "options": {
+          "persistence": {
+            "type": "mysql",
+            "user": "mysql-user",
+            "password": "mysql-password",
+            "host": "mysql-host",
+            "connectionlimit": 10
+          }
+        }
+      },
+      "protocol": "https",
+      "port": "8002",
+      "hostname": "localhost",
+      "certPath": "certs/snowflake",
+      "description": "REST END POINT for your project with no security restrictions",
+      "configfilepath": "./mysql_appconfig.json",
+      "security": "nokey"
     }
   }
 }
